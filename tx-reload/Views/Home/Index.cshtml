@@ -1,0 +1,51 @@
+﻿@using TXTextControl.Web
+@using TXTextControl.Web.MVC
+
+@Html.TXTextControl().TextControl(settings => { settings.Dock = DockStyle.Window; }).Render()
+
+<div id="txReconnectMsg" class="red-square">
+    Trying to reconnect...
+</div>
+
+<script>
+    TXTextControl.addEventListener("textControlLoaded", function (e) {
+        // disable the loading progress dialog
+        TXTextControl.isLoadingDialogEnabled = false;
+
+        // restore the document
+        restoreDocument();
+
+        // set auto save to 500 milliseconds
+	    var intervalAutoSave = setInterval(autoSaveDocument, 500);
+	});
+
+    TXTextControl.addEventListener("webSocketClosed", function (e) {
+        // reload, if connection is lost
+        location.reload();
+    });
+
+    TXTextControl.addEventListener("documentLoaded", function (e) {
+        $("#txReconnectMsg").hide(); // show dialog
+    });
+
+    function autoSaveDocument() {
+        // store the document in the session storage
+        // which is shared over all browser tabs (complete session)
+        TXTextControl.saveDocument(
+            TXTextControl.streamType.InternalUnicodeFormat, function (e) {
+                sessionStorage.document = e.data;
+            }
+        );
+	}
+
+    function restoreDocument() {
+        $("#txReconnectMsg").show(); // hide dialog
+
+        // if document exists, load it from the session storage
+        if (sessionStorage["document"]) {
+	        TXTextControl.loadDocument(
+	            TXTextControl.streamType.InternalUnicodeFormat,
+                sessionStorage.document);
+	    }
+	}
+</script>
