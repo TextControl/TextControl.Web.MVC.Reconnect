@@ -39,13 +39,18 @@
 	}
 
     function restoreDocument() {
-        $("#txReconnectMsg").show(); // hide dialog
+        
 
         // if document exists, load it from the session storage
         if (sessionStorage["document"]) {
+
+            $("#txReconnectMsg").show(); // hide dialog
+
 	        TXTextControl.loadDocument(
 	            TXTextControl.streamType.InternalUnicodeFormat,
                 sessionStorage.document);
-	    }
+        }
+        else
+            $("#txReconnectMsg").hide(); // hide dialog
 	}
 </script>
